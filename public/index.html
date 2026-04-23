@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gina - 点云个人网站</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <canvas id="point-cloud"></canvas>
+    <header class="hero">
+      <h1 id="profile-name">加载中...</h1>
+      <p id="profile-tagline"></p>
+      <p id="profile-summary" class="summary"></p>
+      <nav>
+        <a href="/admin">进入个人编辑台</a>
+      </nav>
+    </header>
+
+    <main class="layout">
+      <section class="card">
+        <h2>个人介绍</h2>
+        <p id="profile-intro"></p>
+      </section>
+
+      <section class="card">
+        <h2>AI 搜索</h2>
+        <div id="chat-log" class="chat-log"></div>
+        <form id="chat-form" class="chat-form">
+          <input id="chat-input" type="text" placeholder="例如：你有哪些AI项目？" required />
+          <button type="submit">搜索</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>项目分类</h2>
+        <div id="categories" class="categories"></div>
+      </section>
+
+      <section class="card">
+        <h2>项目列表</h2>
+        <div id="projects" class="projects"></div>
+      </section>
+    </main>
+
+    <script src="/script.js"></script>
+  </body>
+</html>
