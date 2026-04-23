@@ -94,12 +94,15 @@ app.use("/uploads", express.static(uploadDir));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/api/health", (req, res) => {
+  const usingDefaultAdminToken = !process.env.ADMIN_TOKEN;
   res.json({
     ok: true,
     runtime: "node",
     hasOpenAiKey: Boolean(process.env.OPENAI_API_KEY),
     openAiModel: process.env.OPENAI_MODEL || "gpt-4o-mini",
-    hasAdminToken: Boolean(process.env.ADMIN_TOKEN),
+    hasAdminTokenConfigured: Boolean(process.env.ADMIN_TOKEN),
+    usingDefaultAdminToken,
+    effectiveAdminTokenHint: usingDefaultAdminToken ? "changeme" : "configured in .env",
   });
 });
 
