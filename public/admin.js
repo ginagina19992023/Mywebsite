@@ -8,9 +8,32 @@ function getToken() {
   return tokenInput.value.trim();
 }
 
+async function parseApiResponse(res) {
+  const raw = await res.text();
+  try {
+    return JSON.parse(raw);
+  } catch (err) {
+    if (raw.trim().startsWith("<!doctype") || raw.trim().startsWith("<html")) {
+      throw new Error(
+        "API returned HTML, not JSON. Backend may be unavailable or you are on static hosting."
+      );
+    }
+    throw new Error(`Invalid API response: ${raw.slice(0, 120)}`);
+  }
+}
+
+function explainNetworkError(err) {
+  const hint =
+    " Make sure Node server is running at http://localhost:3000 (use `npm run dev`).";
+  if (String(err.message || "").includes("API returned HTML")) {
+    return `${err.message} ${hint} Static-only deployment (e.g. GitHub Pages) cannot run /api routes.`;
+  }
+  return `${err.message}${hint}`;
+}
+
 async function loadProfile() {
   const res = await fetch("/api/site-data");
-  const data = await res.json();
+  const data = await parseApiResponse(res);
   document.getElementById("name").value = data.profile.name || "";
   document.getElementById("tagline").value = data.profile.tagline || "";
   document.getElementById("summary").value = data.profile.summary || "";
@@ -37,11 +60,11 @@ saveBtn.addEventListener("click", async () => {
         intro: document.getElementById("intro").value.trim(),
       }),
     });
-    const data = await res.json();
+    const data = await parseApiResponse(res);
     if (!res.ok) throw new Error(data.error || "Save failed");
     profileStatus.textContent = "Profile saved.";
   } catch (err) {
-    profileStatus.textContent = `Save failed: ${err.message}`;
+    profileStatus.textContent = `Save failed: ${explainNetworkError(err)}`;
   }
 });
 
@@ -64,12 +87,27 @@ generateBtn.addEventListener("click", async () => {
       headers: { "x-admin-token": token },
       body: formData,
     });
-    const data = await res.json();
+    const data = await parseApiResponse(res);
     if (!res.ok) throw new Error(data.error || "Generation failed");
     generateStatus.textContent = `Done (${data.mode}): ${data.project.title} / ${data.project.category}`;
   } catch (err) {
-    generateStatus.textContent = `Generation failed: ${err.message}`;
+    generateStatus.textContent = `Generation failed: ${explainNetworkError(err)}`;
   }
 });
 
-loadProfile();
+async function runChecks() {
+  try {
+    const res = await fetch("/api/health");
+    const health = await parseApiResponse(res);
+    if (!health.ok) throw new Error("Health check failed");
+    const aiStatus = health.hasOpenAiKey ? "connected" : "missing";
+    generateStatus.textContent = `Backend online. OpenAI key: ${aiStatus}. Model: ${health.openAiModel}`;
+  } catch (err) {
+    generateStatus.textContent = `Backend check failed: ${explainNetworkError(err)}`;
+  }
+}
+
+runChecks();
+loadProfile().catch((err) => {
+  profileStatus.textContent = `Load profile failed: ${explainNetworkError(err)}`;
+});

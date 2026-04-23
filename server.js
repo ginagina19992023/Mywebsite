@@ -93,6 +93,16 @@ app.use(express.json({ limit: "3mb" }));
 app.use("/uploads", express.static(uploadDir));
 app.use(express.static(path.join(__dirname, "public")));
 
+app.get("/api/health", (req, res) => {
+  res.json({
+    ok: true,
+    runtime: "node",
+    hasOpenAiKey: Boolean(process.env.OPENAI_API_KEY),
+    openAiModel: process.env.OPENAI_MODEL || "gpt-4o-mini",
+    hasAdminToken: Boolean(process.env.ADMIN_TOKEN),
+  });
+});
+
 app.get("/api/site-data", (req, res) => {
   const siteData = readSiteData();
   res.json(siteData);
