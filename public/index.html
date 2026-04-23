@@ -1,45 +1,47 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gina - 点云个人网站</title>
+    <title>Creative Portfolio Sphere</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
-  <body>
-    <canvas id="point-cloud"></canvas>
-    <header class="hero">
-      <h1 id="profile-name">加载中...</h1>
-      <p id="profile-tagline"></p>
-      <p id="profile-summary" class="summary"></p>
-      <nav>
-        <a href="/admin">进入个人编辑台</a>
-      </nav>
+  <body class="home-body">
+    <header class="topbar">
+      <div class="brand">Creative Portfolio</div>
+      <a class="pill-link" href="/admin.html">Edit Studio</a>
     </header>
 
-    <main class="layout">
-      <section class="card">
-        <h2>个人介绍</h2>
-        <p id="profile-intro"></p>
+    <main class="home-layout">
+      <section class="sphere-section">
+        <div class="sphere-wrap">
+          <div id="media-sphere" class="media-sphere"></div>
+        </div>
       </section>
 
-      <section class="card">
-        <h2>AI 搜索</h2>
-        <div id="chat-log" class="chat-log"></div>
-        <form id="chat-form" class="chat-form">
-          <input id="chat-input" type="text" placeholder="例如：你有哪些AI项目？" required />
-          <button type="submit">搜索</button>
-        </form>
+      <section class="hero-copy">
+        <h1 id="profile-name">Loading...</h1>
+        <p id="profile-tagline" class="tagline"></p>
+        <p id="profile-summary" class="summary"></p>
+        <p id="profile-intro" class="intro"></p>
       </section>
 
-      <section class="card">
-        <h2>项目分类</h2>
-        <div id="categories" class="categories"></div>
-      </section>
+      <section class="info-grid">
+        <article class="panel">
+          <h2>AI Search</h2>
+          <div id="chat-log" class="chat-log"></div>
+          <form id="chat-form" class="chat-form">
+            <input id="chat-input" type="text" placeholder="Ask about my projects..." required />
+            <button type="submit">Search</button>
+          </form>
+        </article>
 
-      <section class="card">
-        <h2>项目列表</h2>
-        <div id="projects" class="projects"></div>
+        <article class="panel">
+          <h2>Categories</h2>
+          <div id="categories" class="chips"></div>
+          <h2>Projects</h2>
+          <div id="projects" class="project-list"></div>
+        </article>
       </section>
     </main>
 

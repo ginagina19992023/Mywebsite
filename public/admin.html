@@ -1,36 +1,36 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin 编辑台</title>
+    <title>Edit Studio</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
-  <body>
-    <canvas id="point-cloud"></canvas>
+  <body class="admin-body">
     <main class="layout admin-layout">
       <section class="card">
-        <h1>个人编辑台</h1>
-        <p class="hint">仅你自己使用：输入 ADMIN_TOKEN 后即可保存资料和生成项目页。</p>
-        <input id="admin-token" type="password" placeholder="输入 ADMIN_TOKEN" />
+        <a class="pill-link" href="/">Back to Home</a>
+        <h1>Edit Studio</h1>
+        <p class="hint">Private page. Enter ADMIN_TOKEN to update profile and generate project pages.</p>
+        <input id="admin-token" type="password" placeholder="Enter ADMIN_TOKEN" />
       </section>
 
       <section class="card">
-        <h2>主页资料编辑</h2>
-        <input id="name" placeholder="姓名" />
-        <input id="tagline" placeholder="一句话标签" />
+        <h2>Profile Settings</h2>
+        <input id="name" placeholder="Name" />
+        <input id="tagline" placeholder="Tagline" />
         <textarea id="summary" rows="3" placeholder="Summary"></textarea>
-        <textarea id="intro" rows="4" placeholder="个人介绍"></textarea>
-        <button id="save-profile">保存资料</button>
+        <textarea id="intro" rows="4" placeholder="Introduction"></textarea>
+        <button id="save-profile">Save Profile</button>
         <p id="profile-status" class="hint"></p>
       </section>
 
       <section class="card">
-        <h2>AI 输入框：自动生成并分类项目页</h2>
-        <input id="project-title" placeholder="可选：项目标题" />
-        <textarea id="project-content" rows="8" placeholder="输入你的项目内容，AI 会自动整理成页面结构并分类"></textarea>
+        <h2>AI Project Builder</h2>
+        <input id="project-title" placeholder="Optional project title" />
+        <textarea id="project-content" rows="8" placeholder="Paste your project content. AI will package it into a page and classify it."></textarea>
         <input id="project-files" type="file" multiple />
-        <button id="generate-project">生成项目页</button>
+        <button id="generate-project">Generate Page</button>
         <p id="generate-status" class="hint"></p>
       </section>
     </main>

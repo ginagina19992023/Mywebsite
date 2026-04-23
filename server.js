@@ -249,7 +249,7 @@ app.post("/api/chat", async (req, res) => {
 
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    const fallback = `当前网站有 ${siteData.projects.length} 个项目。你问的是：“${message}”。配置 OPENAI_API_KEY 后可获得更智能回答。`;
+    const fallback = `This website currently has ${siteData.projects.length} projects. You asked: "${message}". Add OPENAI_API_KEY for richer answers.`;
     return res.json({ reply: fallback, mode: "fallback" });
   }
 
@@ -281,7 +281,7 @@ app.post("/api/chat", async (req, res) => {
     }
 
     const data = await response.json();
-    const reply = data?.choices?.[0]?.message?.content || "AI 暂时无法回答。";
+    const reply = data?.choices?.[0]?.message?.content || "AI cannot answer right now.";
     return res.json({ reply, mode: "openai" });
   } catch (err) {
     return res.status(500).json({ error: `AI request error: ${err.message}` });
@@ -289,6 +289,10 @@ app.post("/api/chat", async (req, res) => {
 });
 
 app.get("/admin", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "admin.html"));
+});
+
+app.get("/admin.html", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "admin.html"));
 });
 

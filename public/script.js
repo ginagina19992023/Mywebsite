@@ -3,87 +3,71 @@ const chatInput = document.getElementById("chat-input");
 const chatLog = document.getElementById("chat-log");
 const projectsEl = document.getElementById("projects");
 const categoriesEl = document.getElementById("categories");
+const sphereEl = document.getElementById("media-sphere");
 
 function addMessage(role, text) {
   const row = document.createElement("div");
   row.className = `msg ${role === "user" ? "msg-user" : "msg-ai"}`;
-  row.textContent = `${role === "user" ? "你" : "AI"}：${text}`;
+  row.textContent = `${role === "user" ? "You" : "AI"}: ${text}`;
   chatLog.appendChild(row);
   chatLog.scrollTop = chatLog.scrollHeight;
 }
 
-function renderPointCloud() {
-  const canvas = document.getElementById("point-cloud");
-  const ctx = canvas.getContext("2d");
-  const points = [];
-  const amount = 90;
-
-  function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-
-  window.addEventListener("resize", resize);
-  resize();
-
-  for (let i = 0; i < amount; i += 1) {
-    points.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 0.5,
-      vy: (Math.random() - 0.5) * 0.5,
+function renderSphereItems(projects) {
+  const cards = [];
+  projects.forEach((project) => {
+    const img = project.assets.find((asset) => asset.type === "image");
+    cards.push({
+      title: project.title,
+      src: img?.url || null,
+      link: `/project/${project.slug}`,
     });
-  }
+  });
 
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    points.forEach((p) => {
-      p.x += p.vx;
-      p.y += p.vy;
-      if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-      if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-      ctx.fillStyle = "rgba(143,220,255,0.8)";
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
-      ctx.fill();
-    });
-
-    for (let i = 0; i < points.length; i += 1) {
-      for (let j = i + 1; j < points.length; j += 1) {
-        const dx = points[i].x - points[j].x;
-        const dy = points[i].y - points[j].y;
-        const d = Math.sqrt(dx * dx + dy * dy);
-        if (d < 130) {
-          ctx.strokeStyle = `rgba(143,220,255,${1 - d / 130})`;
-          ctx.lineWidth = 0.6;
-          ctx.beginPath();
-          ctx.moveTo(points[i].x, points[i].y);
-          ctx.lineTo(points[j].x, points[j].y);
-          ctx.stroke();
-        }
-      }
+  if (cards.length === 0) {
+    for (let i = 0; i < 26; i += 1) {
+      cards.push({ title: "Portfolio", src: null, link: "#" });
     }
-    requestAnimationFrame(draw);
   }
-  draw();
+
+  sphereEl.innerHTML = "";
+  const radius = 180;
+  cards.slice(0, 48).forEach((card, i, arr) => {
+    const phi = Math.acos(-1 + (2 * i) / arr.length);
+    const theta = Math.sqrt(arr.length * Math.PI) * phi;
+    const x = radius * Math.cos(theta) * Math.sin(phi);
+    const y = radius * Math.sin(theta) * Math.sin(phi);
+    const z = radius * Math.cos(phi);
+
+    const item = document.createElement("a");
+    item.className = "sphere-item";
+    item.href = card.link;
+    item.style.transform = `translate3d(${x + 175}px, ${y + 175}px, ${z}px)`;
+    item.title = card.title;
+    item.innerHTML = card.src
+      ? `<img src="${card.src}" alt="${card.title}" />`
+      : `<span>${card.title}</span>`;
+    sphereEl.appendChild(item);
+  });
 }
 
 async function loadHomepage() {
   const res = await fetch("/api/site-data");
   const data = await res.json();
-  document.getElementById("profile-name").textContent = data.profile.name;
-  document.getElementById("profile-tagline").textContent = data.profile.tagline;
-  document.getElementById("profile-summary").textContent = data.profile.summary;
-  document.getElementById("profile-intro").textContent = data.profile.intro;
+
+  document.getElementById("profile-name").textContent = data.profile.name || "Creative Portfolio";
+  document.getElementById("profile-tagline").textContent = data.profile.tagline || "";
+  document.getElementById("profile-summary").textContent = data.profile.summary || "";
+  document.getElementById("profile-intro").textContent = data.profile.intro || "";
 
   projectsEl.innerHTML = "";
   if (!data.projects.length) {
-    projectsEl.textContent = "暂时还没有项目，请到 admin 生成。";
+    projectsEl.innerHTML = `<div class="meta">No projects yet. Open Edit Studio to create your first one.</div>`;
   }
   data.projects.forEach((project) => {
     const card = document.createElement("a");
     card.href = `/project/${project.slug}`;
-    card.className = "item";
+    card.className = "project-item";
     card.innerHTML = `<strong>${project.title}</strong><div class="meta">${project.category}</div><p>${project.summary}</p>`;
     projectsEl.appendChild(card);
   });
@@ -93,12 +77,14 @@ async function loadHomepage() {
     categoryCount[project.category] = (categoryCount[project.category] || 0) + 1;
   });
   categoriesEl.innerHTML = "";
-  Object.keys(categoryCount).forEach((category) => {
-    const item = document.createElement("div");
-    item.className = "item";
-    item.innerHTML = `<strong>${category}</strong><div class="meta">${categoryCount[category]} 项</div>`;
-    categoriesEl.appendChild(item);
+  Object.entries(categoryCount).forEach(([category, count]) => {
+    const chip = document.createElement("span");
+    chip.className = "chip";
+    chip.textContent = `${category} (${count})`;
+    categoriesEl.appendChild(chip);
   });
+
+  renderSphereItems(data.projects);
 }
 
 chatForm.addEventListener("submit", async (e) => {
@@ -114,13 +100,12 @@ chatForm.addEventListener("submit", async (e) => {
       body: JSON.stringify({ message }),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "请求失败");
+    if (!res.ok) throw new Error(data.error || "Request failed");
     addMessage("ai", data.reply);
   } catch (err) {
-    addMessage("ai", `错误：${err.message}`);
+    addMessage("ai", `Error: ${err.message}`);
   }
 });
 
-addMessage("ai", "你好，我可以帮你检索这个网站里的项目内容。");
-renderPointCloud();
+addMessage("ai", "Hi! Ask me anything about the projects on this site.");
 loadHomepage();

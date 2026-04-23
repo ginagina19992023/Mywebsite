@@ -1,26 +1,25 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>项目详情</title>
+    <title>Project Details</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
-  <body>
-    <canvas id="point-cloud"></canvas>
+  <body class="project-body">
     <main class="layout">
       <section class="card">
-        <a href="/">← 返回主页</a>
-        <h1 id="title">加载中...</h1>
+        <a class="pill-link" href="/">Back to Home</a>
+        <h1 id="title">Loading...</h1>
         <p id="category" class="hint"></p>
         <p id="summary"></p>
       </section>
       <section class="card">
-        <h2>内容</h2>
+        <h2>Content</h2>
         <div id="body"></div>
       </section>
       <section class="card">
-        <h2>素材</h2>
+        <h2>Assets</h2>
         <div id="assets" class="assets"></div>
       </section>
     </main>
